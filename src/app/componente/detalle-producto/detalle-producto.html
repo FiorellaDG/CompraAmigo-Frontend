@@ -1,0 +1,36 @@
+<section class="encabezado">
+  <a mat-stroked-button routerLink="/catalogo">Volver al catálogo</a>
+</section>
+
+@if (cargando()) {
+  <p role="status">Cargando producto…</p>
+}
+
+@if (producto(); as ficha) {
+  <article class="panel detalle-producto">
+    @if (ficha.imagenUrl) {
+      <img [src]="ficha.imagenUrl" [alt]="ficha.nombre">
+    } @else {
+      <div class="sin-foto">Imagen no disponible</div>
+    }
+
+    <div class="producto-info">
+      <p class="etiqueta">{{ ficha.categoria?.nombre }}</p>
+      <h1>{{ ficha.nombre }}</h1>
+      <p>{{ ficha.descripcion }}</p>
+      <strong class="precio">{{ ficha.precio | currency:'PEN':'S/ ' }}</strong>
+      <p>Stock disponible: {{ ficha.stock }}</p>
+
+      @if (ficha.tallas && ficha.tallas.length > 0) {
+        <label>
+          Talla
+          <select [value]="tallaSeleccionada()" (change)="tallaSeleccionada.set($any($event.target).value)">
+            @for (opcion of ficha.tallas; track opcion) {
+              <option [value]="opcion">{{ opcion }}</option>
+            }
+          </select>
+        </label>
+      }
+    </div>
+  </article>
+}
