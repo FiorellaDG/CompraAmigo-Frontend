@@ -1,1 +1,28 @@
-<p>navbar works!</p>
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span>Bienvenido a CompraAmigo · Tu tienda virtual sostenible</span>
+    <span class="example-spacer"></span>
+
+    @if (!estaLogueado()) {
+      <span class="ods-badge">🌱 Consumo Responsable · ODS 12</span>
+    }
+
+    @if (esAdministrador()) {
+      <button mat-raised-button [routerLink]="'/home'">Home</button>
+      <button mat-raised-button [routerLink]="'/admin-productos'">Productos</button>
+      <button mat-raised-button [routerLink]="'/admin-dashboard'">Dashboard ODS</button>
+    }
+
+    @if (esUsuario()) {
+      <button mat-raised-button [routerLink]="'/home'">Home</button>
+      <button mat-raised-button [routerLink]="'/catalogo'">Catálogo</button>
+      <button mat-raised-button [routerLink]="'/carrito'">Carrito</button>
+      <button mat-raised-button [routerLink]="'/impacto'">Mi Impacto ODS</button>
+      <button mat-raised-button [routerLink]="'/chatbot'">Chatbot</button>
+    }
+
+    @if (estaLogueado()) {
+      <button mat-raised-button color="warn" (click)="cerrarSesion()">Cerrar Sesión</button>
+    }
+  </mat-toolbar-row>
+</mat-toolbar>

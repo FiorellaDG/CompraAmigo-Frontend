@@ -1,1 +1,99 @@
-<p>login-component works!</p>
+<div class="login-wrapper">
+  <mat-card class="login-split-card">
+
+    <div class="left-banner">
+      <div class="logo-box">
+        <img src="logo_compraamigo.png" alt="Logo CompraAmigo" class="brand-logo" />
+      </div>
+
+      <div class="banner-overlay">
+        <h2>Compra con propósito</h2>
+        <p>Descubre productos responsables, mide tu impacto positivo en los ODS y recibe ayuda de nuestro asistente inteligente.</p>
+
+        <mat-chip-set class="eco-chips">
+          <mat-chip highlighted>
+            <mat-icon matChipAvatar>eco</mat-icon> Impacto ODS
+          </mat-chip>
+          <mat-chip highlighted>
+            <mat-icon matChipAvatar>smart_toy</mat-icon> Asistente IA
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+    </div>
+
+    <div class="right-form">
+      <div class="brand-title">
+        <h2>CompraAmigo</h2>
+        <span>Elige cómo deseas ingresar o crea tu cuenta</span>
+      </div>
+
+      <mat-tab-group [(selectedIndex)]="tabIndex" mat-stretch-tabs="true" dynamicHeight>
+
+        <mat-tab label="Iniciar Sesión">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()" class="form-container">
+
+            <div class="role-selector">
+              <label class="role-label">Ingresar como:</label>
+              <mat-button-toggle-group formControlName="tipoAcceso" aria-label="Tipo de acceso">
+                <mat-button-toggle value="ROLE_USER">
+                  <mat-icon>person</mat-icon> Usuario
+                </mat-button-toggle>
+                <mat-button-toggle value="ROLE_ADMIN">
+                  <mat-icon>admin_panel_settings</mat-icon> Administrador
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Correo electrónico</mat-label>
+              <input matInput type="email" formControlName="username" placeholder="cliente@gmail.com" />
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contraseña</mat-label>
+              <input matInput [type]="ocultarPassword ? 'password' : 'text'" formControlName="password" />
+              <button mat-icon-button matSuffix type="button" (click)="ocultarPassword = !ocultarPassword">
+                <mat-icon>{{ ocultarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <button type="submit" mat-raised-button class="full-width btn-primary-eco">
+              Ingresar
+            </button>
+          </form>
+        </mat-tab>
+
+        <mat-tab label="Registrarse">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()" class="form-container">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput formControlName="nombre" placeholder="Tu nombre" />
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Correo electrónico</mat-label>
+              <input matInput type="email" formControlName="username" placeholder="ejemplo@correo.com" />
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contraseña</mat-label>
+              <input matInput [type]="ocultarPassword ? 'password' : 'text'" formControlName="password" />
+              <button mat-icon-button matSuffix type="button" (click)="ocultarPassword = !ocultarPassword">
+                <mat-icon>{{ ocultarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <button type="submit" mat-raised-button class="full-width btn-primary-eco">
+              Crear cuenta de Usuario
+            </button>
+          </form>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+
+  </mat-card>
+</div>
