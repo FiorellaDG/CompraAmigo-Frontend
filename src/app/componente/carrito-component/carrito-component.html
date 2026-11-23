@@ -1,0 +1,34 @@
+<section class="encabezado"><div><h1>Tu carrito</h1><p>Revisa los productos antes de confirmar tu pedido.</p></div><a mat-stroked-button routerLink="/catalogo">Seguir comprando</a></section>
+@if (cargando()) { <p role="status">Cargando carrito…</p> }
+@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+@if (items().length) {
+  <div class="dos-columnas">
+    <div class="panel">
+      @for (item of items(); track item.id) {
+        <article class="fila">
+          <div><h2>{{ item.nombreProducto }}</h2><p class="muted">{{ item.talla ? 'Talla ' + item.talla : 'Talla única' }} · {{ item.precio | currency:'PEN':'S/ ' }} por unidad</p></div>
+          <div class="controles">
+            <button type="button" [disabled]="pendiente() || item.cantidad <= 1" (click)="cambiar(item, item.cantidad - 1)" [attr.aria-label]="'Reducir cantidad de ' + item.nombreProducto">−</button>
+            <span>{{ item.cantidad }}</span>
+            <button type="button" [disabled]="pendiente()" (click)="cambiar(item, item.cantidad + 1)" [attr.aria-label]="'Aumentar cantidad de ' + item.nombreProducto">+</button>
+          </div>
+          <strong>{{ item.subtotal | currency:'PEN':'S/ ' }}</strong>
+          <button class="boton-texto" type="button" [disabled]="pendiente()" (click)="quitar(item)" [attr.aria-label]="'Quitar ' + item.nombreProducto">Quitar</button>
+        </article>
+      }
+    </div>
+    <div class="resumen">
+      @if (impacto() !== null) { <app-eco-impacto [valor]="impacto()!" /> }
+      <div class="panel">
+        <p>Subtotal <strong>{{ subtotal() | currency:'PEN':'S/ ' }}</strong></p>
+        @if (totalEstandar(); as importe) {
+          <p>Envío estándar estimado <strong>{{ importe.costoEnvio | currency:'PEN':'S/ ' }}</strong></p>
+          <p>Total estimado <strong>{{ importe.total | currency:'PEN':'S/ ' }}</strong></p>
+        }
+        <a mat-flat-button routerLink="/checkout" [disabled]="pendiente()">Continuar al checkout</a>
+      </div>
+    </div>
+  </div>
+} @else if (!cargando() && !error()) {
+  <div class="panel"><h2>Tu carrito está vacío</h2><a mat-flat-button routerLink="/catalogo">Explorar el catálogo</a></div>
+}
