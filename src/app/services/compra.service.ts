@@ -6,7 +6,7 @@ import {CarritoItem, Categoria, DatosEntrega, Pedido, Perfil, Producto, Producto
 @Injectable({providedIn: 'root'})
 export class CompraService {
   private readonly http = inject(HttpClient);
-  private readonly url = environment.apiUrl;
+  private readonly url = environment.apiURL;
 
   listarProductos() {
     return this.http.get<Producto[]>(this.url + '/productos');
