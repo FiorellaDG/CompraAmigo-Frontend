@@ -1,9 +1,18 @@
 <section class="encabezado"><div><h1>Gestión de pedidos</h1><p>Actualiza el estado que verá el cliente en su seguimiento.</p></div></section>
 @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
 @if (aviso()) { <p class="aviso" role="status">{{ aviso() }}</p> }
+@if (pedidos().length) {
+  <mat-form-field appearance="outline">
+    <mat-label>Filtrar por estado</mat-label>
+    <mat-select [value]="filtro()" (selectionChange)="filtro.set($event.value)">
+      <mat-option value="">Todos los estados</mat-option>
+      @for (estado of estados; track estado) { <mat-option [value]="estado">{{ estado }}</mat-option> }
+    </mat-select>
+  </mat-form-field>
+}
 <section class="panel tabla-desplazable" aria-label="Pedidos registrados">
   <table><thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead><tbody>
-    @for (pedido of pedidos(); track pedido.pedidoId) {
+    @for (pedido of visibles(); track pedido.pedidoId) {
       <tr><td>#{{ pedido.pedidoId }}</td><td>{{ pedido.nombreUsuario }}</td><td>{{ pedido.fecha | date:'dd/MM/yyyy' }}</td>
         <td>{{ pedido.total | currency:'PEN':'S/ ' }}</td><td><div class="acciones">
           <mat-select [value]="pedido.estado" #estado [aria-label]="'Estado del pedido ' + pedido.pedidoId">
@@ -11,6 +20,8 @@
           </mat-select>
           <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="actualizar(pedido, estado.value)">Guardar estado</button>
         </div></td></tr>
-    } @empty { <tr><td colspan="5">{{ ocupado() ? 'Cargando pedidos…' : 'No hay pedidos.' }}</td></tr> }
+    } @empty {
+      <tr><td colspan="5">{{ ocupado() ? 'Cargando pedidos…' : (filtro() ? 'No hay pedidos en ese estado.' : 'No hay pedidos.') }}</td></tr>
+    }
   </tbody></table>
 </section>
