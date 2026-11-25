@@ -20,10 +20,22 @@ export class Catalogo implements OnInit {
   protected readonly sesion = inject(SesionService);
   protected readonly productos = signal<Producto[]>([]);
   protected readonly busqueda = signal('');
+  protected readonly categoriaSeleccionada = signal<number | null>(null);
+  protected readonly categorias = computed(() => {
+    const porId = new Map<number, string>();
+    for (const {categoria} of this.productos()) {
+      if (categoria?.nombre) porId.set(categoria.id, categoria.nombre);
+    }
+    return [...porId].sort((a, b) => a[1].localeCompare(b[1], 'es'));
+  });
   protected readonly visibles = computed(() => {
     const normalizar = (texto: string) => texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
     const termino = normalizar(this.busqueda().trim());
-    return this.productos().filter(producto => normalizar(producto.nombre).includes(termino));
+    const categoria = this.categoriaSeleccionada();
+    return this.productos().filter(producto =>
+      (categoria === null || producto.categoria?.id === categoria) &&
+      normalizar(producto.nombre).includes(termino),
+    );
   });
   protected readonly cargando = signal(true);
   protected readonly pendiente = signal<number | null>(null);

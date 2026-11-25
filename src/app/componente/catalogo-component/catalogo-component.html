@@ -8,6 +8,18 @@
 @if (!cargando() && productos().length) {
   <mat-form-field appearance="outline" class="buscar-producto"><mat-label>Buscar por nombre</mat-label><input matInput type="search" #buscar [value]="busqueda()" (input)="busqueda.set(buscar.value)" placeholder="Ej. mochila">
   <mat-error>Revisa este campo.</mat-error></mat-form-field>
+  @if (categorias().length) {
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <mat-select [value]="categoriaSeleccionada()" [canSelectNullableOptions]="true"
+                  (selectionChange)="categoriaSeleccionada.set($event.value)">
+        <mat-option [value]="null">Todas</mat-option>
+        @for (categoria of categorias(); track categoria[0]) {
+          <mat-option [value]="categoria[0]">{{ categoria[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
   <p class="muted conteo-productos" aria-live="polite">{{ visibles().length }} productos</p>
 }
 <div class="catalogo">
@@ -35,6 +47,8 @@
       </div>
     </article>
   } @empty {
-    @if (!cargando() && !error()) { <p>{{ busqueda().trim() ? 'No se encontraron productos con ese nombre.' : 'El catálogo está vacío.' }}</p> }
+    @if (!cargando() && !error()) {
+      <p>{{ busqueda().trim() ? 'No se encontraron productos con ese nombre.' : 'El catálogo está vacío.' }}</p>
+    }
   }
 </div>
