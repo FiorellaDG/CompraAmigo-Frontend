@@ -20,6 +20,10 @@
     <div class="resumen">
       @if (impacto() !== null) { <app-eco-impacto [valor]="impacto()!" /> }
       <div class="panel">
+        @if (errorResumen()) {
+          <p class="error" role="alert">{{ errorResumen() }}</p>
+          <button mat-stroked-button type="button" (click)="reintentarResumen()">Actualizar resumen</button>
+        }
         <p>Subtotal <strong>{{ subtotal() | currency:'PEN':'S/ ' }}</strong></p>
         @if (totalEstandar(); as importe) {
           <p>Envío estándar estimado <strong>{{ importe.costoEnvio | currency:'PEN':'S/ ' }}</strong></p>
