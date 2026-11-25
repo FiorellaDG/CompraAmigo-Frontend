@@ -11,6 +11,8 @@ import {imagenProducto, tallasProducto} from '../../model/presentacion-producto'
 import {CompraService, mensajeDeError} from '../../services/compra.service';
 import {SesionService} from '../../services/sesion.service';
 
+type OrdenCatalogo = 'original' | 'precio-menor' | 'precio-mayor' | 'nombre';
+
 @Component({
   imports: [MatFormFieldModule, MatInputModule, MatSelectModule, CurrencyPipe, MatButtonModule, RouterLink],
   styleUrl: './catalogo-component.css', templateUrl: './catalogo-component.html',
@@ -20,6 +22,7 @@ export class Catalogo implements OnInit {
   protected readonly sesion = inject(SesionService);
   protected readonly productos = signal<Producto[]>([]);
   protected readonly busqueda = signal('');
+  protected readonly orden = signal<OrdenCatalogo>('original');
   protected readonly categoriaSeleccionada = signal<number | null>(null);
   protected readonly categorias = computed(() => {
     const porId = new Map<number, string>();
@@ -32,10 +35,16 @@ export class Catalogo implements OnInit {
     const normalizar = (texto: string) => texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
     const termino = normalizar(this.busqueda().trim());
     const categoria = this.categoriaSeleccionada();
-    return this.productos().filter(producto =>
+    const productos = this.productos().filter(producto =>
       (categoria === null || producto.categoria?.id === categoria) &&
       normalizar(producto.nombre).includes(termino),
     );
+    switch (this.orden()) {
+      case 'precio-menor': return productos.sort((a, b) => a.precio - b.precio);
+      case 'precio-mayor': return productos.sort((a, b) => b.precio - a.precio);
+      case 'nombre': return productos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      default: return productos;
+    }
   });
   protected readonly cargando = signal(false);
   protected readonly errorCarga = signal('');

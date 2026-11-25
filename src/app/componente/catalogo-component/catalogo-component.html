@@ -24,6 +24,15 @@
       </mat-select>
     </mat-form-field>
   }
+  <mat-form-field appearance="outline">
+    <mat-label>Ordenar por</mat-label>
+    <mat-select [value]="orden()" (selectionChange)="orden.set($event.value)">
+      <mat-option value="original">Orden del catálogo</mat-option>
+      <mat-option value="precio-menor">Precio: menor a mayor</mat-option>
+      <mat-option value="precio-mayor">Precio: mayor a menor</mat-option>
+      <mat-option value="nombre">Nombre: A a Z</mat-option>
+    </mat-select>
+  </mat-form-field>
   <p class="muted conteo-productos" aria-live="polite">{{ visibles().length }} productos</p>
 }
 <div class="catalogo">
