@@ -7,7 +7,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {Router, RouterLink} from '@angular/router';
-import {catchError, EMPTY, finalize, startWith, switchMap} from 'rxjs';
+import {catchError, EMPTY, finalize, merge, startWith, Subject, switchMap} from 'rxjs';
 import {CarritoItem, TotalCheckout} from '../../model/compra';
 import {CompraService, mensajeDeError} from '../../services/compra.service';
 import {SesionService} from '../../services/sesion.service';
@@ -22,10 +22,12 @@ export class Checkout implements OnInit {
   private readonly usuario = inject(SesionService).sesion()!;
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly recotizar = new Subject<void>();
   protected readonly items = signal<CarritoItem[]>([]);
   protected readonly cargando = signal(true);
   protected readonly enviando = signal(false);
   protected readonly error = signal('');
+  protected readonly errorCotizacion = signal('');
   protected readonly total = signal<TotalCheckout | null>(null);
   protected readonly impacto = signal<number | null>(null);
   protected readonly formulario = inject(FormBuilder).nonNullable.group({
@@ -48,13 +50,14 @@ export class Checkout implements OnInit {
       },
       error: error => this.error.set(mensajeDeError(error)),
     });
-    this.formulario.controls.metodoEnvio.valueChanges.pipe(
-      startWith(this.formulario.controls.metodoEnvio.value),
-      switchMap(envio => {
+    const metodoEnvio = this.formulario.controls.metodoEnvio;
+    merge(metodoEnvio.valueChanges, this.recotizar).pipe(
+      startWith(undefined),
+      switchMap(() => {
         this.total.set(null);
-        this.error.set('');
-        return this.compra.totalCheckout(envio).pipe(catchError(error => {
-          this.error.set(mensajeDeError(error));
+        this.errorCotizacion.set('');
+        return this.compra.totalCheckout(metodoEnvio.value).pipe(catchError(error => {
+          this.errorCotizacion.set(mensajeDeError(error));
           return EMPTY;
         }));
       }),
@@ -68,6 +71,10 @@ export class Checkout implements OnInit {
       next: items => this.items.set(items),
       error: error => this.error.set(mensajeDeError(error)),
     });
+  }
+
+  reintentarCotizacion() {
+    this.recotizar.next();
   }
 
   confirmar() {

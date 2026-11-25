@@ -22,6 +22,10 @@
       <div class="panel">
         <h2>Resumen del carrito</h2>
         @for (item of items(); track item.id) { <p>{{ item.cantidad }} × {{ item.nombreProducto }}</p> }
+        @if (errorCotizacion()) {
+          <p class="error" role="alert">{{ errorCotizacion() }}</p>
+          <button mat-stroked-button type="button" (click)="reintentarCotizacion()">Recalcular total</button>
+        }
         @if (total(); as importe) {
           <p>Subtotal <strong>{{ importe.subtotal | currency:'PEN':'S/ ' }}</strong></p>
           <p>Envío <strong>{{ importe.costoEnvio | currency:'PEN':'S/ ' }}</strong></p>
