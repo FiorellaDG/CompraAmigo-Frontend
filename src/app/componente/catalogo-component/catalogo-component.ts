@@ -37,15 +37,23 @@ export class Catalogo implements OnInit {
       normalizar(producto.nombre).includes(termino),
     );
   });
-  protected readonly cargando = signal(true);
+  protected readonly cargando = signal(false);
+  protected readonly errorCarga = signal('');
   protected readonly pendiente = signal<number | null>(null);
   protected readonly error = signal('');
   protected readonly aviso = signal('');
 
   ngOnInit() {
+    this.cargarCatalogo();
+  }
+
+  cargarCatalogo() {
+    if (this.cargando()) return;
+    this.cargando.set(true);
+    this.errorCarga.set('');
     this.compra.listarProductos().pipe(finalize(() => this.cargando.set(false))).subscribe({
       next: productos => this.productos.set(productos),
-      error: error => this.error.set(mensajeDeError(error)),
+      error: error => this.errorCarga.set(mensajeDeError(error)),
     });
   }
 
