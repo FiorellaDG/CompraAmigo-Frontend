@@ -43,9 +43,16 @@ export class Checkout implements OnInit {
   ngOnInit() {
     this.compra.perfil().subscribe({
       next: perfil => {
-        if (!this.formulario.dirty) {
-          this.formulario.patchValue({nombreReceptor: perfil.nombre ?? '', telefono: perfil.telefono ?? '',
-            ciudad: perfil.ciudad ?? '', distrito: perfil.distrito ?? '', direccionEnvio: perfil.direccion ?? ''});
+        const valores = {
+          nombreReceptor: perfil.nombre || this.usuario.nombre,
+          telefono: perfil.telefono ?? '',
+          ciudad: perfil.ciudad ?? '',
+          distrito: perfil.distrito ?? '',
+          direccionEnvio: perfil.direccion ?? '',
+        };
+        for (const campo of ['nombreReceptor', 'telefono', 'ciudad', 'distrito', 'direccionEnvio'] as const) {
+          const control = this.formulario.controls[campo];
+          if (control.pristine) control.setValue(valores[campo]);
         }
       },
       error: error => this.error.set(mensajeDeError(error)),
