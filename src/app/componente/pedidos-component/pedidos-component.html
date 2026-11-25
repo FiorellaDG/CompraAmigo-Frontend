@@ -1,6 +1,9 @@
 <section class="encabezado"><div><h1>Mis pedidos</h1><p>Consulta el estado y el impacto registrado en cada compra.</p></div><a mat-stroked-button routerLink="/catalogo">Volver al catálogo</a></section>
 @if (cargando()) { <p role="status">Cargando pedidos…</p> }
-@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+  <button mat-stroked-button type="button" (click)="cargarPedidos()">Reintentar historial</button>
+}
 <div class="pedidos">
   @for (pedido of pedidos(); track pedido.pedidoId) {
     <article class="panel pedido">
