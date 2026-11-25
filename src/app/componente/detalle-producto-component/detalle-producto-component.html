@@ -3,7 +3,7 @@
 @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
 @if (producto(); as ficha) {
   <article class="panel detalle-producto">
-    @if (imagen(ficha); as foto) { <img [src]="foto" [alt]="ficha.nombre"> }
+    @if (imagen(ficha); as foto) { <img [src]="foto" [alt]="ficha.nombre" (error)="imagenFallida.set(foto)"> }
     @else { <div class="sin-foto">Imagen no disponible</div> }
     <div class="producto-info">
       <p class="etiqueta">{{ ficha.categoria?.nombre }}</p>

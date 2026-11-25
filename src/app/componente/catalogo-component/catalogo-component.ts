@@ -67,7 +67,16 @@ export class Catalogo implements OnInit {
   }
 
   protected readonly tallas = tallasProducto;
-  protected readonly imagen = imagenProducto;
+  private readonly imagenesFallidas = signal<ReadonlySet<string>>(new Set());
+
+  imagen(producto: Producto): string | null {
+    const ruta = imagenProducto(producto);
+    return ruta && !this.imagenesFallidas().has(ruta) ? ruta : null;
+  }
+
+  ocultarImagen(ruta: string) {
+    this.imagenesFallidas.update(fallidas => new Set(fallidas).add(ruta));
+  }
 
   agregar(producto: Producto, talla: string) {
     const usuario = this.sesion.sesion();

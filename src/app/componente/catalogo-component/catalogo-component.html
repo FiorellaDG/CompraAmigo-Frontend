@@ -38,7 +38,7 @@
 <div class="catalogo">
   @for (producto of visibles(); track producto.id) {
     <article class="producto">
-      @if (imagen(producto); as foto) { <img [src]="foto" [alt]="producto.nombre" loading="lazy"> }
+      @if (imagen(producto); as foto) { <img [src]="foto" [alt]="producto.nombre" loading="lazy" (error)="ocultarImagen(foto)"> }
       @else { <div class="sin-foto">Imagen no disponible</div> }
       <div class="producto-info">
         @if (producto.categoria?.nombre) { <p class="etiqueta">{{ producto.categoria?.nombre }}</p> }

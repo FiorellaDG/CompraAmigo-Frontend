@@ -20,8 +20,13 @@ export class DetalleProducto implements OnInit {
   protected readonly enviando = signal(false);
   protected readonly error = signal('');
   protected readonly agregado = signal(false);
-  protected readonly imagen = imagenProducto;
+  protected readonly imagenFallida = signal<string | null>(null);
   protected readonly tallas = tallasProducto;
+
+  imagen(producto: Producto): string | null {
+    const ruta = imagenProducto(producto);
+    return this.imagenFallida() === ruta ? null : ruta;
+  }
 
   ngOnInit() {
     const segmento = this.ruta.snapshot.paramMap.get('id') ?? '';
