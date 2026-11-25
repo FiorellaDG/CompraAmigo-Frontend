@@ -16,10 +16,17 @@ export class Pedidos implements OnInit {
   private readonly compra = inject(CompraService);
   private readonly usuario = inject(SesionService).sesion()!;
   protected readonly pedidos = signal<Pedido[]>([]);
-  protected readonly cargando = signal(true);
+  protected readonly cargando = signal(false);
   protected readonly error = signal('');
 
   ngOnInit() {
+    this.cargarPedidos();
+  }
+
+  cargarPedidos() {
+    if (this.cargando()) return;
+    this.cargando.set(true);
+    this.error.set('');
     this.compra.listarPedidos(this.usuario.userId).pipe(finalize(() => this.cargando.set(false))).subscribe({
       next: pedidos => this.pedidos.set(pedidos),
       error: error => this.error.set(mensajeDeError(error)),

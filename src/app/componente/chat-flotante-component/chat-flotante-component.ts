@@ -19,7 +19,7 @@ export class ChatFlotante {
   protected readonly error = signal('');
   protected readonly mensajes = signal<{consulta: string; respuesta: string}[]>([]);
   protected readonly formulario = inject(FormBuilder).group({
-    mensaje: ['', [Validators.required, Validators.maxLength(250)]],
+    mensaje: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(250)]],
     pedidoId: [null as number | null, [Validators.min(1), Validators.pattern(/^\d+$/)]],
   });
 
@@ -32,7 +32,8 @@ export class ChatFlotante {
     this.compra.chat(consulta, pedidoId).pipe(finalize(() => this.enviando.set(false))).subscribe({
       next: respuesta => {
         this.mensajes.update(items => [...items, {consulta, respuesta: respuesta.respuesta}]);
-        this.formulario.controls.mensaje.reset();
+        const campoMensaje = this.formulario.controls.mensaje;
+        if (campoMensaje.value === mensaje) campoMensaje.reset();
       },
       error: error => this.error.set(mensajeDeError(error)),
     });

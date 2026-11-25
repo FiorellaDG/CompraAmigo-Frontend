@@ -3,7 +3,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {CurrencyPipe} from '@angular/common';
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
@@ -11,11 +11,20 @@ import {finalize, forkJoin} from 'rxjs';
 import {Categoria, Producto, ProductoEditable} from '../../model/compra';
 import {CompraService, mensajeDeError} from '../../services/compra.service';
 
+const STOCK_MAXIMO = 2_147_483_647;
+
 @Component({imports: [MatFormFieldModule, MatInputModule, MatSelectModule, CurrencyPipe, ReactiveFormsModule, MatButtonModule, MatDialogModule], styleUrl: './admin-productos-component.css', templateUrl: './admin-productos-component.html'})
 export class AdminProductos implements OnInit {
+  protected readonly stockMaximo = STOCK_MAXIMO;
   private readonly compra = inject(CompraService);
   private readonly dialogo = inject(MatDialog);
   protected readonly productos = signal<Producto[]>([]);
+  protected readonly busqueda = signal('');
+  protected readonly productosVisibles = computed(() => {
+    const normalizar = (texto: string) => texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+    const termino = normalizar(this.busqueda().trim());
+    return this.productos().filter(producto => normalizar(producto.nombre).includes(termino));
+  });
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly editando = signal<number | null>(null);
   protected readonly formularioVisible = signal(false);
@@ -26,7 +35,7 @@ export class AdminProductos implements OnInit {
     nombre: ['', [Validators.required, Validators.maxLength(255)]],
     descripcion: ['', Validators.maxLength(255)],
     precio: [0, [Validators.required, Validators.min(0.01)]],
-    stock: [0, [Validators.required, Validators.min(0), Validators.pattern(/^[0-9]+$/)]],
+    stock: [0, [Validators.required, Validators.min(0), Validators.max(STOCK_MAXIMO), Validators.pattern(/^[0-9]+$/)]],
     co2: [0, [Validators.required, Validators.min(0)]],
     imagen: ['', Validators.maxLength(255)],
     tallas: ['', Validators.maxLength(255)],
@@ -72,9 +81,11 @@ export class AdminProductos implements OnInit {
   }
 
   guardarStock(producto: Producto, valor: string) {
+    if (this.ocupado()) return;
     const stock = Number(valor);
-    if (this.ocupado() || !valor.trim() || !Number.isInteger(stock) || stock < 0) {
-      this.error.set('Ingresa un stock entero mayor o igual a cero.');
+    if (!valor.trim() || !Number.isSafeInteger(stock) || stock < 0 || stock > STOCK_MAXIMO) {
+      this.aviso.set('');
+      this.error.set('Ingresa un stock entero entre 0 y 2 147 483 647.');
       return;
     }
     this.iniciarOperacion();

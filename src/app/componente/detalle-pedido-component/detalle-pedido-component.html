@@ -1,9 +1,12 @@
 <section class="encabezado">
-  <div><h1>{{ confirmacion ? 'Pedido confirmado' : 'Seguimiento del pedido' }}</h1></div>
+  <div><h1>{{ confirmacion && pedido() ? 'Pedido confirmado' : 'Seguimiento del pedido' }}</h1></div>
   <a mat-stroked-button routerLink="/pedidos">Mis pedidos</a>
 </section>
 @if (cargando()) { <p role="status">Cargando pedido…</p> }
-@if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+  @if (enlaceValido()) { <button mat-stroked-button type="button" (click)="reintentar()">Reintentar pedido</button> }
+}
 @if (pedido(); as orden) {
   <div class="dos-columnas">
     <section class="panel">

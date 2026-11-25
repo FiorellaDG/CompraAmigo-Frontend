@@ -1,8 +1,9 @@
 import {CurrencyPipe} from '@angular/common';
-import {Component, OnInit, computed, inject, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, computed, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatButtonModule} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
-import {Observable, finalize, forkJoin} from 'rxjs';
+import {EMPTY, Observable, Subject, catchError, finalize, forkJoin, startWith, switchMap} from 'rxjs';
 import {CarritoItem, TotalCheckout} from '../../model/compra';
 import {CompraService, mensajeDeError} from '../../services/compra.service';
 import {SesionService} from '../../services/sesion.service';
@@ -15,19 +16,49 @@ import {EcoImpacto} from '../eco-impacto-component/eco-impacto-component';
 export class Carrito implements OnInit {
   private readonly compra = inject(CompraService);
   private readonly usuario = inject(SesionService).sesion()!;
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly actualizarResumen = new Subject<void>();
   protected readonly items = signal<CarritoItem[]>([]);
-  protected readonly cargando = signal(true);
+  protected readonly cargando = signal(false);
   protected readonly pendiente = signal(false);
   protected readonly error = signal('');
+  protected readonly errorCarga = signal('');
   protected readonly subtotal = computed(() => this.items().reduce((total, item) => total + item.subtotal, 0));
   protected readonly impacto = signal<number | null>(null);
   protected readonly totalEstandar = signal<TotalCheckout | null>(null);
+  protected readonly errorResumen = signal('');
 
   ngOnInit() {
-    this.cargarImpacto();
-    this.compra.listarCarrito(this.usuario.userId).pipe(finalize(() => this.cargando.set(false))).subscribe({
+    this.actualizarResumen.pipe(
+      startWith(undefined),
+      switchMap(() => {
+        this.impacto.set(null);
+        this.totalEstandar.set(null);
+        this.errorResumen.set('');
+        return forkJoin({impacto: this.compra.impactoCarrito(), total: this.compra.totalCheckout('estandar')})
+          .pipe(catchError(error => {
+            this.errorResumen.set(mensajeDeError(error));
+            return EMPTY;
+          }));
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(({impacto, total}) => {
+      this.impacto.set(impacto.kgCo2Ahorrados);
+      this.totalEstandar.set(total);
+    });
+    this.cargarCarrito();
+  }
+
+  cargarCarrito() {
+    if (this.cargando()) return;
+    this.cargando.set(true);
+    this.errorCarga.set('');
+    this.compra.listarCarrito(this.usuario.userId).pipe(
+      finalize(() => this.cargando.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: items => this.items.set(items),
-      error: error => this.error.set(mensajeDeError(error)),
+      error: error => this.errorCarga.set(mensajeDeError(error)),
     });
   }
 
@@ -47,20 +78,12 @@ export class Carrito implements OnInit {
     this.error.set('');
     this.pendiente.set(true);
     peticion.pipe(finalize(() => this.pendiente.set(false))).subscribe({
-      next: resultado => { aplicar(resultado); this.cargarImpacto(); },
+      next: resultado => { aplicar(resultado); this.reintentarResumen(); },
       error: error => this.error.set(mensajeDeError(error)),
     });
   }
 
-  private cargarImpacto() {
-    this.impacto.set(null);
-    this.totalEstandar.set(null);
-    forkJoin({impacto: this.compra.impactoCarrito(), total: this.compra.totalCheckout('estandar')}).subscribe({
-      next: ({impacto, total}) => {
-        this.impacto.set(impacto.kgCo2Ahorrados);
-        this.totalEstandar.set(total);
-      },
-      error: error => this.error.set(mensajeDeError(error)),
-    });
+  reintentarResumen() {
+    this.actualizarResumen.next();
   }
 }

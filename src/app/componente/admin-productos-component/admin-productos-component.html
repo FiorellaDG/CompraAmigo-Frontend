@@ -13,7 +13,7 @@
       </mat-select><mat-error>Revisa este campo.</mat-error></mat-form-field>
       <mat-form-field appearance="outline" class="ancho"><mat-label>Descripción</mat-label><input matInput formControlName="descripcion"><mat-error>Revisa este campo.</mat-error></mat-form-field>
       <mat-form-field appearance="outline" ><mat-label>Precio (S/)</mat-label><input matInput type="number" min="0.01" step="0.01" formControlName="precio"><mat-error>Revisa este campo.</mat-error></mat-form-field>
-      <mat-form-field appearance="outline" ><mat-label>Stock inicial</mat-label><input matInput type="number" min="0" step="1" formControlName="stock"><mat-error>Revisa este campo.</mat-error></mat-form-field>
+      <mat-form-field appearance="outline" ><mat-label>Stock inicial</mat-label><input matInput type="number" min="0" [max]="stockMaximo" step="1" formControlName="stock"><mat-error>Ingresa un stock entero entre 0 y 2 147 483 647.</mat-error></mat-form-field>
       <mat-form-field appearance="outline" ><mat-label>CO₂ por unidad</mat-label><input matInput type="number" min="0" step="0.1" formControlName="co2"><mat-error>Revisa este campo.</mat-error></mat-form-field>
       <mat-form-field appearance="outline" ><mat-label>Tallas separadas por comas</mat-label><input matInput formControlName="tallas"><mat-error>Revisa este campo.</mat-error></mat-form-field>
       <mat-form-field appearance="outline" class="ancho"><mat-label>Ruta de imagen</mat-label><input matInput formControlName="imagen" placeholder="images/productos/ejemplo.jpg"><mat-error>Revisa este campo.</mat-error></mat-form-field>
@@ -23,17 +23,25 @@
     <button mat-button type="button" (click)="formularioVisible.set(false)">Cancelar</button></div>
   </form>
 }
+@if (productos().length) {
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar en inventario</mat-label>
+    <input matInput type="search" #filtro [value]="busqueda()" (input)="busqueda.set(filtro.value)">
+  </mat-form-field>
+}
 <section class="panel tabla-desplazable" aria-label="Inventario de productos">
   <table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
     <tbody>
-      @for (producto of productos(); track producto.id) {
+      @for (producto of productosVisibles(); track producto.id) {
         <tr><td>{{ producto.nombre }}</td><td>{{ producto.precio | currency:'PEN':'S/ ' }}</td>
-          <td><div class="acciones"><input matInput #stock type="number" min="0" step="1" [value]="producto.stock" [attr.aria-label]="'Stock de ' + producto.nombre">
+          <td><div class="acciones"><input matInput #stock type="number" min="0" [max]="stockMaximo" step="1" [value]="producto.stock" [attr.aria-label]="'Stock de ' + producto.nombre">
           <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="guardarStock(producto, stock.value)">Guardar stock</button></div></td>
           <td><div class="acciones"><button mat-button type="button" [disabled]="ocupado()" (click)="abrir(producto)">Editar</button>
           <button mat-button type="button" [disabled]="ocupado()" (click)="eliminar(producto)">Eliminar</button></div></td>
         </tr>
-      } @empty { <tr><td colspan="4">{{ ocupado() ? 'Cargando productos…' : 'No hay productos.' }}</td></tr> }
+      } @empty {
+        <tr><td colspan="4">{{ ocupado() ? 'Cargando productos…' : (busqueda().trim() ? 'No hay productos con ese nombre.' : 'No hay productos.') }}</td></tr>
+      }
     </tbody>
   </table>
 </section>

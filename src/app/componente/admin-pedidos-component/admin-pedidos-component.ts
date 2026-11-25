@@ -1,16 +1,22 @@
 import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {finalize} from 'rxjs';
 import {ESTADOS_PEDIDO, Pedido} from '../../model/compra';
 import {CompraService, mensajeDeError} from '../../services/compra.service';
 
-@Component({imports: [MatSelectModule, CurrencyPipe, DatePipe, MatButtonModule], styleUrl: './admin-pedidos-component.css', templateUrl: './admin-pedidos-component.html'})
+@Component({imports: [MatFormFieldModule, MatSelectModule, CurrencyPipe, DatePipe, MatButtonModule], styleUrl: './admin-pedidos-component.css', templateUrl: './admin-pedidos-component.html'})
 export class AdminPedidos implements OnInit {
   private readonly compra = inject(CompraService);
   protected readonly pedidos = signal<Pedido[]>([]);
   protected readonly estados = ESTADOS_PEDIDO;
+  protected readonly filtro = signal('');
+  protected readonly visibles = computed(() => {
+    const estado = this.filtro();
+    return estado ? this.pedidos().filter(pedido => pedido.estado === estado) : this.pedidos();
+  });
   protected readonly ocupado = signal(true);
   protected readonly error = signal('');
   protected readonly aviso = signal('');

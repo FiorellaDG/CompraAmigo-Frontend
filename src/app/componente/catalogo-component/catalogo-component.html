@@ -3,17 +3,42 @@
   @if (sesion.sesion()?.roles?.includes('ROLE_USER')) { <a mat-stroked-button routerLink="/carrito">Ver carrito</a> }
 </section>
 @if (cargando()) { <p role="status">Cargando catálogo…</p> }
+@if (errorCarga()) {
+  <p class="error" role="alert">{{ errorCarga() }}</p>
+  <button mat-stroked-button type="button" (click)="cargarCatalogo()">Reintentar catálogo</button>
+}
 @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
 @if (aviso()) { <p class="aviso" role="status">{{ aviso() }} <a routerLink="/carrito">Ver carrito</a></p> }
 @if (!cargando() && productos().length) {
   <mat-form-field appearance="outline" class="buscar-producto"><mat-label>Buscar por nombre</mat-label><input matInput type="search" #buscar [value]="busqueda()" (input)="busqueda.set(buscar.value)" placeholder="Ej. mochila">
   <mat-error>Revisa este campo.</mat-error></mat-form-field>
+  @if (categorias().length) {
+    <mat-form-field appearance="outline">
+      <mat-label>Categoría</mat-label>
+      <mat-select [value]="categoriaSeleccionada()" [canSelectNullableOptions]="true"
+                  (selectionChange)="categoriaSeleccionada.set($event.value)">
+        <mat-option [value]="null">Todas</mat-option>
+        @for (categoria of categorias(); track categoria[0]) {
+          <mat-option [value]="categoria[0]">{{ categoria[1] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+  <mat-form-field appearance="outline">
+    <mat-label>Ordenar por</mat-label>
+    <mat-select [value]="orden()" (selectionChange)="orden.set($event.value)">
+      <mat-option value="original">Orden del catálogo</mat-option>
+      <mat-option value="precio-menor">Precio: menor a mayor</mat-option>
+      <mat-option value="precio-mayor">Precio: mayor a menor</mat-option>
+      <mat-option value="nombre">Nombre: A a Z</mat-option>
+    </mat-select>
+  </mat-form-field>
   <p class="muted conteo-productos" aria-live="polite">{{ visibles().length }} productos</p>
 }
 <div class="catalogo">
   @for (producto of visibles(); track producto.id) {
     <article class="producto">
-      @if (imagen(producto); as foto) { <img [src]="foto" [alt]="producto.nombre" loading="lazy"> }
+      @if (imagen(producto); as foto) { <img [src]="foto" [alt]="producto.nombre" loading="lazy" (error)="ocultarImagen(foto)"> }
       @else { <div class="sin-foto">Imagen no disponible</div> }
       <div class="producto-info">
         @if (producto.categoria?.nombre) { <p class="etiqueta">{{ producto.categoria?.nombre }}</p> }
@@ -35,6 +60,8 @@
       </div>
     </article>
   } @empty {
-    @if (!cargando() && !error()) { <p>{{ busqueda().trim() ? 'No se encontraron productos con ese nombre.' : 'El catálogo está vacío.' }}</p> }
+    @if (!cargando() && !errorCarga()) {
+      <p>{{ busqueda().trim() ? 'No se encontraron productos con ese nombre.' : 'El catálogo está vacío.' }}</p>
+    }
   }
 </div>

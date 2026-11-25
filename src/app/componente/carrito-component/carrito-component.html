@@ -1,5 +1,9 @@
 <section class="encabezado"><div><h1>Tu carrito</h1><p>Revisa los productos antes de confirmar tu pedido.</p></div><a mat-stroked-button routerLink="/catalogo">Seguir comprando</a></section>
 @if (cargando()) { <p role="status">Cargando carrito…</p> }
+@if (errorCarga()) {
+  <p class="error" role="alert">{{ errorCarga() }}</p>
+  <button mat-stroked-button type="button" (click)="cargarCarrito()">Reintentar carrito</button>
+}
 @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
 @if (items().length) {
   <div class="dos-columnas">
@@ -20,6 +24,10 @@
     <div class="resumen">
       @if (impacto() !== null) { <app-eco-impacto [valor]="impacto()!" /> }
       <div class="panel">
+        @if (errorResumen()) {
+          <p class="error" role="alert">{{ errorResumen() }}</p>
+          <button mat-stroked-button type="button" (click)="reintentarResumen()">Actualizar resumen</button>
+        }
         <p>Subtotal <strong>{{ subtotal() | currency:'PEN':'S/ ' }}</strong></p>
         @if (totalEstandar(); as importe) {
           <p>Envío estándar estimado <strong>{{ importe.costoEnvio | currency:'PEN':'S/ ' }}</strong></p>
@@ -29,6 +37,6 @@
       </div>
     </div>
   </div>
-} @else if (!cargando() && !error()) {
+} @else if (!cargando() && !errorCarga()) {
   <div class="panel"><h2>Tu carrito está vacío</h2><a mat-flat-button routerLink="/catalogo">Explorar el catálogo</a></div>
 }

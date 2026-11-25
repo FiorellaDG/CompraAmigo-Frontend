@@ -1,5 +1,5 @@
 <section class="encabezado"><div><h1>Soporte</h1><p>Registra tu consulta para que el equipo pueda revisarla.</p></div></section>
-<form class="panel soporte" [formGroup]="formulario" (ngSubmit)="registrar()">
+<form class="panel soporte" [formGroup]="formulario" #formularioEstado="ngForm" (ngSubmit)="registrar(formularioEstado)">
   <mat-form-field appearance="outline" ><mat-label>Asunto</mat-label><input matInput formControlName="asunto" maxlength="120" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
   <mat-form-field appearance="outline" ><mat-label>Mensaje</mat-label><textarea matInput formControlName="mensaje" maxlength="2000" rows="5" required></textarea><mat-error>Revisa este campo.</mat-error></mat-form-field>
   <mat-form-field appearance="outline" ><mat-label>Número de pedido (opcional)</mat-label><input matInput type="number" min="1" formControlName="pedidoId"><mat-error>Revisa este campo.</mat-error></mat-form-field>
