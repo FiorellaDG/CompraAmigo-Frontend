@@ -26,6 +26,13 @@ El checkout usa precios y totales calculados por Spring. El medio de pago se reg
 Para verificar la compilación ejecuta `npm.cmd run build`. Para la prueba de navegación ejecuta `npm.cmd test -- --watch=false`.
 El proxy se aplica al servidor local de desarrollo. La configuración del despliegue debe resolver `/api` hacia el backend del entorno.
 
+### Preparar el frontend para la demo en EC2
+
+1. En la terminal de WebStorm, ejecuta `npm.cmd ci` y `npm.cmd run build`. En Linux usa `npm ci` y `npm run build`.
+2. Copia el contenido de `dist/CompraAmigo-Frontend/browser/` a la carpeta `frontend/` del paquete de EC2. Incluye `index.html`, JavaScript, estilos e imágenes.
+3. Usa la configuración de Nginx de `deploy/ec2` en el backend de CompraAmigo. Nginx sirve los archivos de Angular y reenvía las solicitudes a `/api/` a Spring Boot. Así la pantalla y la API se pueden abrir desde la misma IPv4 pública.
+4. Antes de presentar, abre `/api/health` y confirma que devuelve `{"status":"UP"}`. Verifica el registro de un cliente nuevo, abre el catálogo, recarga `/catalogo` y comprueba que la compra aparezca en **Mis pedidos**.
+
 ### Verificación de la integración
 
 Se comprobó la compilación de producción, las pruebas automáticas de navegación, login y cambio de sesión, y un recorrido de navegador contra Spring Boot, PostgreSQL temporal y un buzón SMTP de prueba.
