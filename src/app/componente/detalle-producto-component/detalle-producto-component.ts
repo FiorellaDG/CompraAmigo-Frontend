@@ -24,7 +24,13 @@ export class DetalleProducto implements OnInit {
   protected readonly tallas = tallasProducto;
 
   ngOnInit() {
-    const id = Number(this.ruta.snapshot.paramMap.get('id'));
+    const segmento = this.ruta.snapshot.paramMap.get('id') ?? '';
+    const id = Number(segmento);
+    if (!/^\d+$/.test(segmento) || !Number.isSafeInteger(id) || id < 1) {
+      this.error.set('El enlace del producto no es válido. Vuelve al catálogo para elegir uno.');
+      this.cargando.set(false);
+      return;
+    }
     this.compra.producto(id).pipe(finalize(() => this.cargando.set(false))).subscribe({
       next: producto => this.producto.set(producto),
       error: error => this.error.set(mensajeDeError(error)),
