@@ -14,11 +14,11 @@ export class PerfilCliente implements OnInit {
   protected readonly guardado = signal(false);
   protected readonly error = signal('');
   protected readonly formulario = inject(FormBuilder).nonNullable.group({
-    nombre: ['', [Validators.required, Validators.maxLength(100)]],
+    nombre: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
     telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]],
-    ciudad: ['', [Validators.required, Validators.maxLength(100)]],
-    distrito: ['', [Validators.required, Validators.maxLength(100)]],
-    direccion: ['', [Validators.required, Validators.maxLength(250)]],
+    ciudad: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+    distrito: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+    direccion: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(250)]],
   });
 
   ngOnInit() {
@@ -33,12 +33,13 @@ export class PerfilCliente implements OnInit {
   }
 
   guardar() {
-    if (this.ocupado() || this.formulario.invalid) {
+    if (this.ocupado()) return;
+    this.guardado.set(false);
+    if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
     this.ocupado.set(true);
-    this.guardado.set(false);
     this.error.set('');
     this.compra.guardarPerfil(this.formulario.getRawValue()).pipe(finalize(() => this.ocupado.set(false))).subscribe({
       next: () => this.guardado.set(true),

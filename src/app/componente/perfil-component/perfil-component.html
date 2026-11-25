@@ -8,7 +8,7 @@
     <mat-form-field appearance="outline" ><mat-label>Distrito</mat-label><input matInput formControlName="distrito" autocomplete="address-level2"><mat-error>Revisa este campo.</mat-error></mat-form-field>
     <mat-form-field appearance="outline" class="ancho"><mat-label>Dirección</mat-label><input matInput formControlName="direccion" autocomplete="street-address"><mat-error>Revisa este campo.</mat-error></mat-form-field>
   </div>
-  @if (formulario.touched && formulario.invalid) { <p class="error-campo">Completa los campos. El teléfono debe tener 9 dígitos.</p> }
+  @if (formulario.touched && formulario.invalid) { <p class="error-campo">Escribe el nombre y la dirección completos. El teléfono debe tener 9 dígitos.</p> }
   @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
   @if (guardado()) { <p class="aviso" role="status">Perfil guardado.</p> }
   <button mat-flat-button type="submit" [disabled]="ocupado()">Guardar perfil</button>
