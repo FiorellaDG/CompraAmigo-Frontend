@@ -14,7 +14,7 @@ export const loginInterceptor: HttpInterceptorFn = (req, next) => {
   const authReq = propia && !publica && token
     ? req.clone({ setHeaders: { Authorization: 'Bearer ' + token } }) : req;
   return next(authReq).pipe(catchError(error => {
-    if (propia && !publica && error.status === 401) {
+    if (propia && !publica && token && token === login.getToken() && error.status === 401) {
       login.logout();
       router.navigate(['/login']);
     }
