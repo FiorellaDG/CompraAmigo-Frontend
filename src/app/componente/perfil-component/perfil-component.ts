@@ -10,7 +10,9 @@ import {CompraService, mensajeDeError} from '../../services/compra.service';
 export class PerfilCliente implements OnInit {
   private readonly compra = inject(CompraService);
   protected readonly correo = signal('');
-  protected readonly ocupado = signal(true);
+  protected readonly ocupado = signal(false);
+  protected readonly perfilCargado = signal(false);
+  protected readonly errorCarga = signal('');
   protected readonly guardado = signal(false);
   protected readonly error = signal('');
   protected readonly formulario = inject(FormBuilder).nonNullable.group({
@@ -22,18 +24,26 @@ export class PerfilCliente implements OnInit {
   });
 
   ngOnInit() {
+    this.cargarPerfil();
+  }
+
+  cargarPerfil() {
+    if (this.ocupado()) return;
+    this.ocupado.set(true);
+    this.errorCarga.set('');
     this.compra.perfil().pipe(finalize(() => this.ocupado.set(false))).subscribe({
       next: p => {
         this.correo.set(p.correo);
         this.formulario.setValue({nombre: p.nombre ?? '', telefono: p.telefono ?? '',
           ciudad: p.ciudad ?? '', distrito: p.distrito ?? '', direccion: p.direccion ?? ''});
+        this.perfilCargado.set(true);
       },
-      error: error => this.error.set(mensajeDeError(error)),
+      error: error => this.errorCarga.set(mensajeDeError(error)),
     });
   }
 
   guardar() {
-    if (this.ocupado()) return;
+    if (this.ocupado() || !this.perfilCargado()) return;
     this.guardado.set(false);
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();

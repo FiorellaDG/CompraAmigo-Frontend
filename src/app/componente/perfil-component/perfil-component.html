@@ -1,4 +1,10 @@
 <section class="encabezado"><div><h1>Mi perfil</h1><p>Guarda la dirección que quieres usar al comprar.</p></div></section>
+@if (!perfilCargado() && ocupado()) { <p role="status">Cargando perfil…</p> }
+@if (errorCarga()) {
+  <p class="error" role="alert">{{ errorCarga() }}</p>
+  <button mat-stroked-button type="button" (click)="cargarPerfil()">Reintentar perfil</button>
+}
+@if (perfilCargado()) {
 <form class="panel formulario-acotado" [formGroup]="formulario" (ngSubmit)="guardar()">
   <mat-form-field appearance="outline" ><mat-label>Correo de la cuenta</mat-label><input matInput type="email" [value]="correo()" readonly><mat-error>Revisa este campo.</mat-error></mat-form-field>
   <div class="campos">
@@ -13,3 +19,4 @@
   @if (guardado()) { <p class="aviso" role="status">Perfil guardado.</p> }
   <button mat-flat-button type="submit" [disabled]="ocupado()">Guardar perfil</button>
 </form>
+}
