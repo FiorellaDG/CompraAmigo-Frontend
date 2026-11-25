@@ -19,9 +19,10 @@ export class Carrito implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly actualizarResumen = new Subject<void>();
   protected readonly items = signal<CarritoItem[]>([]);
-  protected readonly cargando = signal(true);
+  protected readonly cargando = signal(false);
   protected readonly pendiente = signal(false);
   protected readonly error = signal('');
+  protected readonly errorCarga = signal('');
   protected readonly subtotal = computed(() => this.items().reduce((total, item) => total + item.subtotal, 0));
   protected readonly impacto = signal<number | null>(null);
   protected readonly totalEstandar = signal<TotalCheckout | null>(null);
@@ -45,9 +46,19 @@ export class Carrito implements OnInit {
       this.impacto.set(impacto.kgCo2Ahorrados);
       this.totalEstandar.set(total);
     });
-    this.compra.listarCarrito(this.usuario.userId).pipe(finalize(() => this.cargando.set(false))).subscribe({
+    this.cargarCarrito();
+  }
+
+  cargarCarrito() {
+    if (this.cargando()) return;
+    this.cargando.set(true);
+    this.errorCarga.set('');
+    this.compra.listarCarrito(this.usuario.userId).pipe(
+      finalize(() => this.cargando.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: items => this.items.set(items),
-      error: error => this.error.set(mensajeDeError(error)),
+      error: error => this.errorCarga.set(mensajeDeError(error)),
     });
   }
 
