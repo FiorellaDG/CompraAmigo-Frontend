@@ -6,11 +6,11 @@
     <form class="panel formulario-checkout" [formGroup]="formulario" (ngSubmit)="confirmar()">
       <h2>Datos de entrega</h2>
       <div class="campos">
-        <mat-form-field appearance="outline" ><mat-label>Nombre del receptor</mat-label><input matInput formControlName="nombreReceptor" autocomplete="name" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
+        <mat-form-field appearance="outline" ><mat-label>Nombre del receptor</mat-label><input matInput formControlName="nombreReceptor" autocomplete="name" required><mat-error>Ingresa un nombre de hasta 100 caracteres.</mat-error></mat-form-field>
         <mat-form-field appearance="outline" ><mat-label>Teléfono</mat-label><input matInput formControlName="telefono" type="tel" autocomplete="tel" inputmode="numeric" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
-        <mat-form-field appearance="outline" ><mat-label>Ciudad</mat-label><input matInput formControlName="ciudad" autocomplete="address-level1" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
-        <mat-form-field appearance="outline" ><mat-label>Distrito</mat-label><input matInput formControlName="distrito" autocomplete="address-level2" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
-        <mat-form-field appearance="outline" class="ancho"><mat-label>Dirección</mat-label><input matInput formControlName="direccionEnvio" autocomplete="street-address" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
+        <mat-form-field appearance="outline" ><mat-label>Ciudad</mat-label><input matInput formControlName="ciudad" autocomplete="address-level1" required><mat-error>Ingresa una ciudad de hasta 100 caracteres.</mat-error></mat-form-field>
+        <mat-form-field appearance="outline" ><mat-label>Distrito</mat-label><input matInput formControlName="distrito" autocomplete="address-level2" required><mat-error>Ingresa un distrito de hasta 100 caracteres.</mat-error></mat-form-field>
+        <mat-form-field appearance="outline" class="ancho"><mat-label>Dirección</mat-label><input matInput formControlName="direccionEnvio" autocomplete="street-address" required><mat-error>Ingresa una dirección de hasta 250 caracteres.</mat-error></mat-form-field>
         <mat-form-field appearance="outline" ><mat-label>Método de envío</mat-label><mat-select formControlName="metodoEnvio"><mat-option value="estandar">Envío estándar</mat-option><mat-option value="express">Envío exprés</mat-option><mat-option value="recojo">Recojo en tienda</mat-option></mat-select><mat-error>Revisa este campo.</mat-error></mat-form-field>
         <mat-form-field appearance="outline" ><mat-label>Método de pago</mat-label><mat-select formControlName="metodoPago"><mat-option value="Contra entrega">Contra entrega</mat-option><mat-option value="Yape / Plin">Yape / Plin</mat-option></mat-select><mat-error>Revisa este campo.</mat-error></mat-form-field>
       </div>

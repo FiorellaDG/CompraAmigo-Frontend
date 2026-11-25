@@ -31,11 +31,11 @@ export class Checkout implements OnInit {
   protected readonly total = signal<TotalCheckout | null>(null);
   protected readonly impacto = signal<number | null>(null);
   protected readonly formulario = inject(FormBuilder).nonNullable.group({
-    nombreReceptor: [this.usuario.nombre, Validators.required],
+    nombreReceptor: [this.usuario.nombre, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
     telefono: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-    ciudad: ['', Validators.required],
-    distrito: ['', Validators.required],
-    direccionEnvio: ['', Validators.required],
+    ciudad: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+    distrito: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+    direccionEnvio: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(250)]],
     metodoEnvio: ['estandar', Validators.required],
     metodoPago: ['Contra entrega', Validators.required],
   });
