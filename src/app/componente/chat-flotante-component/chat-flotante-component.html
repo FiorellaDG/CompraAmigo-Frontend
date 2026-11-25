@@ -13,7 +13,9 @@
         <mat-form-field appearance="outline" ><mat-label>Mensaje</mat-label><input matInput formControlName="mensaje" maxlength="250" required><mat-error>Revisa este campo.</mat-error></mat-form-field>
         <mat-form-field appearance="outline" ><mat-label>Número de pedido (opcional)</mat-label><input matInput type="number" min="1" formControlName="pedidoId"><mat-error>Revisa este campo.</mat-error></mat-form-field>
         @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
-        <button mat-flat-button type="submit" [disabled]="enviando() || formulario.invalid">Enviar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando() || formulario.invalid">
+          {{ enviando() ? 'Enviando…' : 'Enviar' }}
+        </button>
       </form>
       <a routerLink="/soporte" (click)="abierto.set(false)">Contactar soporte humano</a>
     </section>
