@@ -23,17 +23,25 @@
     <button mat-button type="button" (click)="formularioVisible.set(false)">Cancelar</button></div>
   </form>
 }
+@if (productos().length) {
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar en inventario</mat-label>
+    <input matInput type="search" #filtro [value]="busqueda()" (input)="busqueda.set(filtro.value)">
+  </mat-form-field>
+}
 <section class="panel tabla-desplazable" aria-label="Inventario de productos">
   <table><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
     <tbody>
-      @for (producto of productos(); track producto.id) {
+      @for (producto of productosVisibles(); track producto.id) {
         <tr><td>{{ producto.nombre }}</td><td>{{ producto.precio | currency:'PEN':'S/ ' }}</td>
           <td><div class="acciones"><input matInput #stock type="number" min="0" step="1" [value]="producto.stock" [attr.aria-label]="'Stock de ' + producto.nombre">
           <button mat-stroked-button type="button" [disabled]="ocupado()" (click)="guardarStock(producto, stock.value)">Guardar stock</button></div></td>
           <td><div class="acciones"><button mat-button type="button" [disabled]="ocupado()" (click)="abrir(producto)">Editar</button>
           <button mat-button type="button" [disabled]="ocupado()" (click)="eliminar(producto)">Eliminar</button></div></td>
         </tr>
-      } @empty { <tr><td colspan="4">{{ ocupado() ? 'Cargando productos…' : 'No hay productos.' }}</td></tr> }
+      } @empty {
+        <tr><td colspan="4">{{ ocupado() ? 'Cargando productos…' : (busqueda().trim() ? 'No hay productos con ese nombre.' : 'No hay productos.') }}</td></tr>
+      }
     </tbody>
   </table>
 </section>

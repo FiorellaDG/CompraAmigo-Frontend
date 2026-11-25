@@ -3,7 +3,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {CurrencyPipe} from '@angular/common';
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
@@ -16,6 +16,12 @@ export class AdminProductos implements OnInit {
   private readonly compra = inject(CompraService);
   private readonly dialogo = inject(MatDialog);
   protected readonly productos = signal<Producto[]>([]);
+  protected readonly busqueda = signal('');
+  protected readonly productosVisibles = computed(() => {
+    const normalizar = (texto: string) => texto.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+    const termino = normalizar(this.busqueda().trim());
+    return this.productos().filter(producto => normalizar(producto.nombre).includes(termino));
+  });
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly editando = signal<number | null>(null);
   protected readonly formularioVisible = signal(false);
